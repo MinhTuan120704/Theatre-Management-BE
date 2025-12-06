@@ -112,3 +112,7 @@ reports/
 
 # Other
 *.tgz
+
+# Certificates
+/src/certs
+./src/certs
