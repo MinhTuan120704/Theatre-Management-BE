@@ -6,7 +6,7 @@ const router: Router = Router();
 router.get("/", TicketController.getAll);
 router.get("/:id", TicketController.getById);
 router.post("/", TicketController.create);
-router.put("/:id", TicketController.update);
+router.patch("/:id", TicketController.update);
 router.delete("/:id", TicketController.delete);
 
 export default router;
