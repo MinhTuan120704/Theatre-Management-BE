@@ -116,3 +116,5 @@ reports/
 # Certificates
 /src/certs
 ./src/certs
+
+package-lock.json
