@@ -6,7 +6,7 @@ const router: Router = Router();
 router.get("/", ShowTimeController.getAll);
 router.get("/:id", ShowTimeController.getById);
 router.post("/", ShowTimeController.create);
-router.put("/:id", ShowTimeController.update);
+router.patch("/:id", ShowTimeController.update);
 router.delete("/:id", ShowTimeController.delete);
 
 export default router;

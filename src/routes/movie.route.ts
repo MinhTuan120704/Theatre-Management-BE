@@ -6,7 +6,7 @@ const router: Router = Router();
 router.get("/", MovieController.getAll);
 router.get("/:id", MovieController.getById);
 router.post("/", MovieController.create);
-router.put("/:id", MovieController.update);
+router.patch("/:id", MovieController.update);
 router.delete("/:id", MovieController.delete);
 
 export default router;
