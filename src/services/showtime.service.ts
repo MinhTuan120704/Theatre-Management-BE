@@ -1,3 +1,4 @@
+import e from 'express';
 import Showtime from '../models/showTime.model';
 
 export class ShowtimeService {
@@ -26,3 +27,5 @@ export class ShowtimeService {
     return true;
   }
 }
+
+export default ShowtimeService;
