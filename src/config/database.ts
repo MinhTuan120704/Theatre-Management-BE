@@ -27,7 +27,7 @@ const sequelize = new Sequelize({
     acquire: 30000,
     idle: 10000,
   },
-  models: [__dirname + "/../models/*.model.ts"],
+  models: [path.resolve(__dirname, "..", "models")],
 });
 
 export default sequelize;

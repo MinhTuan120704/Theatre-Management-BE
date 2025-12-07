@@ -1,12 +1,12 @@
-import { Router } from 'express';
-import SeatController from '../controllers/seat.controller';
+import { Router } from "express";
+import SeatController from "../controllers/seat.controller";
 
-const router = Router();
+const router: Router = Router();
 
-router.get('/', SeatController.getAll);
-router.get('/:id', SeatController.getById);
-router.post('/', SeatController.create);
-router.put('/:id', SeatController.update);
-router.delete('/:id', SeatController.delete);
+router.get("/", SeatController.getAll);
+router.get("/:id", SeatController.getById);
+router.post("/", SeatController.create);
+router.put("/:id", SeatController.update);
+router.delete("/:id", SeatController.delete);
 
 export default router;
