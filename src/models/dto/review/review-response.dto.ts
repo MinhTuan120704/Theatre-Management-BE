@@ -1,8 +1,8 @@
 export interface ReviewResponseDto {
-  review_id: number;
-  user_id: number;
-  movie_id: number;
+  id: number;
+  userId: number;
+  movieId: number;
   rating: number;
   comment: string;
-  created_at: Date;
+  createdAt: Date;
 }

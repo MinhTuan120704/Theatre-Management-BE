@@ -1,10 +1,10 @@
 export interface DiscountResponseDto {
-  discount_id: number;
+  id: number;
   code: string;
-  discount_type: 'percentage' | 'fixed';
+  discountType: 'percentage' | 'fixed';
   value: number;
-  max_usage: number;
-  min_purchase: number;
-  expiry_date: Date;
-  created_at: Date;
+  maxUsage?: number;
+  minPurchase?: number;
+  expiryDate: Date;
+  createdAt: Date;
 }

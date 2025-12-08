@@ -1,8 +1,8 @@
 export interface DiscountUpdateDto {
   code?: string;
-  discount_type?: 'percentage' | 'fixed';
+  discountType?: 'percentage' | 'fixed';
   value?: number;
-  max_usage?: number;
-  min_purchase?: number;
-  expiry_date?: Date;
+  maxUsage?: number;
+  minPurchase?: number;
+  expiryDate?: Date;
 }

@@ -1,12 +1,12 @@
 export interface MovieUpdateDto {
   title?: string;
-  genre?: any;
+  genres?: string[];
   description?: string;
   director?: string;
-  actors?: any;
+  actors?: string[];
   country?: string;
-  duration?: number;
-  release_date?: Date;
-  poster_url?: string;
-  trailer_url?: string;
+  durationMinutes?: number;
+  releaseDate?: Date;
+  posterUrl?: string;
+  trailerUrl?: string;
 }

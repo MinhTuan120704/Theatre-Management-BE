@@ -1,10 +1,10 @@
 export interface UserResponseDto {
-  user_id: number;
-  full_name: string;
+  id: number;
+  fullName: string;
   email: string;
   phone: string;
   dob: Date;
-  cccd: string;
+  identifyCode: string;
   role: 'customer' | 'admin' | 'employee';
-  created_at: Date;
+  createdAt: Date;
 }
