@@ -1,7 +1,7 @@
 export interface RoomCreateDto {
-  cinema_id: number;
+  cinemaId: number;
   name: string;
-  seat_count: number;
+  capacity: number;
   seats?: Array<{
     seat_name: string;
     seat_column: string;

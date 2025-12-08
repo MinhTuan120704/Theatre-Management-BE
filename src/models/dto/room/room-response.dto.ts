@@ -1,8 +1,8 @@
 export interface RoomResponseDto {
-  room_id: number;
-  cinema_id: number;
+  id: number;
+  cinemaId: number;
   name: string;
-  seat_count: number;
+  capacity: number;
   cinema?: {
     name: string;
     address: string;

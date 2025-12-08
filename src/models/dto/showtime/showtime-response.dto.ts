@@ -1,7 +1,7 @@
 export interface ShowtimeResponseDto {
-  showtime_id: number;
-  room_id: number;
-  movie_id: number;
-  showtime: Date;
+  id: number;
+  roomId: number;
+  movieId: number;
+  showTime: Date;
   price: number;
 }

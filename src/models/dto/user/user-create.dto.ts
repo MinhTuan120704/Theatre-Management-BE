@@ -1,9 +1,9 @@
 export interface UserCreateDto {
-  full_name: string;
+  fullName: string;
   email: string;
   phone: string;
-  password_hash: string;
+  passwordHash: string;
   dob: Date;
-  cccd: string;
+  identifyCode: string;
   role: 'customer' | 'admin' | 'employee';
 }

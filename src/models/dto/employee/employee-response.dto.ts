@@ -1,6 +1,6 @@
 export interface EmployeeResponseDto {
-  employee_id: number;
-  cinema_id: number;
+  employeeId: number;
+  cinemaId: number;
   position: string;
   shift: string;
 }

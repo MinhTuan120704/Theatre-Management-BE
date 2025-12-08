@@ -1,9 +1,9 @@
 export interface OrderUpdateDto {
-  user_id?: number;
-  total_price?: number;
-  payment_method?: 'credit_card' | 'paypal' | 'cash';
+  userId?: number;
+  totalPrice?: number;
+  paymentMethod?: 'credit_card' | 'paypal' | 'cash';
   status?: 'pending' | 'completed' | 'failed' | 'cancelled';
-  paid_at?: Date;
-  discount_id?: number;
-  ordered_at?: Date;
+  paidAt?: Date;
+  discountId?: number;
+  orderedAt?: Date;
 }

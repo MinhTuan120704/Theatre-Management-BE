@@ -1,5 +1,5 @@
 export interface RoomUpdateDto {
-  cinema_id?: number;
+  cinemaId?: number;
   name?: string;
-  seat_count?: number;
+  capacity?: number;
 }

@@ -1,5 +1,5 @@
 export interface ProductResponseDto {
-  product_id: number;
+  id: number;
   name: string;
   price: number;
   category: 'food' | 'drink';
