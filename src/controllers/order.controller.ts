@@ -2,6 +2,15 @@ import { Request, Response } from 'express';
 import { OrderService } from '../services/order.service';
 
 export default class OrderController {
+  static async getOrderByUserId(req: Request, res: Response) {
+    try {
+      const userId = Number(req.params.userId);
+      const orders = await OrderService.getOrderByUserId(userId);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch orders by user' });
+    }
+  }
   static async getAll(req: Request, res: Response) {
     try {
       const orders = await OrderService.getAll();

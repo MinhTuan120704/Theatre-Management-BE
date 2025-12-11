@@ -40,6 +40,20 @@ export default class UserController {
     }
   }
 
+  static async getByEmail(req: Request, res: Response) {
+    try {
+      const email = req.params.email || '';
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+      const user = await UserService.getByEmail(email);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch user by email' });
+    }
+  }
+
   static async delete(req: Request, res: Response) {
     try {
       const deleted = await UserService.delete(Number(req.params.id));
