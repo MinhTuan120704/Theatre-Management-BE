@@ -1,6 +1,24 @@
+import Ticket from '../models/ticket.model';
 import Seat from '../models/seat.model';
+import ShowTime from '../models/showTime.model';
 
 export class SeatService {
+  static async getByShowtimeId(showtimeId: number) {
+    // Lấy tất cả ticket của showtimeId
+    const tickets = await Ticket.findAll({ where: { showtimeId } });
+    const reservedSeatIds = tickets.map(t => t.seatId);
+    // Lấy tất cả seat thuộc phòng của showtime đó
+    // Giả sử có thể lấy roomId từ showtimeId, hoặc truyền roomId vào
+    // Ở đây sẽ lấy tất cả seat trong phòng, sau đó đánh dấu isReserved
+    const showtime = await ShowTime.findByPk(showtimeId);
+    if (!showtime) return [];
+    // Lấy tất cả seat thuộc roomId của showtime
+    const seats = await Seat.findAll({ where: { roomId: showtime.roomId } });
+    return seats.map(seat => ({
+      ...seat.toJSON(),
+      isReserved: reservedSeatIds.includes(seat.id)
+    }));
+  }
   static async create(data: any) {
     return Seat.create(data);
   }
@@ -24,5 +42,9 @@ export class SeatService {
     if (!seat) return null;
     await seat.destroy();
     return true;
+  }
+
+  static async getByRoomId(roomId: number) {
+    return Seat.findAll({ where: { roomId } });
   }
 }

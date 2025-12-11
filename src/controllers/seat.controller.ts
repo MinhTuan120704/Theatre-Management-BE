@@ -11,6 +11,16 @@ export default class SeatController {
     }
   }
 
+  static async getByRoomId(req: Request, res: Response) {
+    try {
+      const roomId = Number(req.params.roomId);
+      const seats = await SeatService.getByRoomId(roomId);
+      res.json(seats);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch seats by room' });
+    }
+  }
+
   static async getById(req: Request, res: Response) {
     try {
       const seat = await SeatService.getById(Number(req.params.id));
@@ -47,6 +57,16 @@ export default class SeatController {
       res.json({ message: 'Seat deleted successfully' });
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete seat' });
+    }
+  }
+
+  static async getByShowtimeId(req: Request, res: Response) {
+    try {
+      const showtimeId = Number(req.params.showtimeId);
+      const seats = await SeatService.getByShowtimeId(showtimeId);
+      res.json(seats);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch seats by showtime' });
     }
   }
 }

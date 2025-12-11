@@ -24,6 +24,14 @@ export default class RoomController {
   static async create(req: Request, res: Response) {
     try {
       const newRoom = await RoomService.create(req.body);
+      // Nếu có danh sách seats trong DTO, tạo ghế cho phòng mới
+      if (req.body.seats && Array.isArray(req.body.seats)) {
+        await Promise.all(
+          req.body.seats.map((seat: any) =>
+            RoomService.createSeatForRoom(newRoom.id, seat)
+          )
+        );
+      }
       res.status(201).json(newRoom);
     } catch (error) {
       res.status(500).json({ error: 'Failed to create room' });

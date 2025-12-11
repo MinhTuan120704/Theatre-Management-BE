@@ -1,4 +1,5 @@
 import Room from '../models/room.model';
+import Seat from '../models/seat.model';
 
 export class RoomService {
   static async create(data: any) {
@@ -24,5 +25,13 @@ export class RoomService {
     if (!room) return null;
     await room.destroy();
     return true;
+  }
+
+  static async createSeatForRoom(roomId: number, seatData: { seatNumber: string; isReserved?: boolean }) {
+    return Seat.create({
+      roomId,
+      seatNumber: seatData.seatNumber,
+      isReserved: seatData.isReserved ?? false,
+    });
   }
 }
