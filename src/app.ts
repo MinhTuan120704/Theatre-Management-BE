@@ -4,8 +4,29 @@ import type { Request, Response, NextFunction, Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const app: Application = express();
+
+// Swagger setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Theatre Management API',
+      version: '1.0.0',
+      description: 'API documentation for Theatre Management System',
+    },
+    servers: [
+      { url: 'http://localhost:8000', description: 'Local server' },
+      { url: 'http://localhost:4000', description: 'Production server' }
+    ],
+  },
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/models/dto/**/*.ts'], // Đường dẫn tới các file chứa swagger comment
+};
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware
 app.use(helmet());

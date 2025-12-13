@@ -1,11 +1,121 @@
+
 import { Router } from "express";
 import CinemaController from "../controllers/cinema.controller";
 
 const router: Router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Cinema
+ *   description: API endpoints for managing cinemas
+ */
+
+/**
+ * @swagger
+ * /api/cinemas:
+ *   get:
+ *     summary: Get all cinemas
+ *     tags: [Cinema]
+ *     responses:
+ *       200:
+ *         description: List of all cinemas
+ *   post:
+ *     summary: Create a new cinema
+ *     tags: [Cinema]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the cinema
+ *               address:
+ *                 type: string
+ *                 description: Address of the cinema
+ *           example:
+ *             name: "Galaxy Cinema"
+ *             address: "123 Main St, City"
+ *     responses:
+ *       201:
+ *         description: Cinema created successfully
+ *       400:
+ *         description: Invalid input
+ */
 router.get("/", CinemaController.getAll);
-router.get("/:id", CinemaController.getById);
 router.post("/", CinemaController.create);
+
+/**
+ * @swagger
+ * /api/cinemas/{id}:
+ *   get:
+ *     summary: Get a cinema by ID
+ *     tags: [Cinema]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Cinema ID
+ *     responses:
+ *       200:
+ *         description: Cinema found
+ *       404:
+ *         description: Cinema not found
+ *   patch:
+ *     summary: Update a cinema by ID
+ *     tags: [Cinema]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Cinema ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the cinema
+ *               address:
+ *                 type: string
+ *                 description: Address of the cinema
+ *           example:
+ *             name: "CGV Cinema"
+ *             address: "456 Another St, City"
+ *     responses:
+ *       200:
+ *         description: Cinema updated successfully
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Cinema not found
+ *   delete:
+ *     summary: Delete a cinema by ID
+ *     tags: [Cinema]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Cinema ID
+ *     responses:
+ *       200:
+ *         description: Cinema deleted successfully
+ *       404:
+ *         description: Cinema not found
+ */
+router.get("/:id", CinemaController.getById);
 router.patch("/:id", CinemaController.update);
 router.delete("/:id", CinemaController.delete);
 
