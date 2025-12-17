@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import RoomController from "../controllers/room.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -61,7 +65,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", RoomController.getAll);
-router.post("/", RoomController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.rooms.create),
+  RoomController.create
+);
 
 /**
  * @swagger
@@ -134,7 +143,17 @@ router.post("/", RoomController.create);
  *         description: Room not found
  */
 router.get("/:id", RoomController.getById);
-router.patch("/:id", RoomController.update);
-router.delete("/:id", RoomController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.rooms.update),
+  RoomController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.rooms.delete),
+  RoomController.delete
+);
 
 export default router;

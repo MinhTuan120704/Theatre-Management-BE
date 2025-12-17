@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import CinemaController from "../controllers/cinema.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -46,7 +50,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", CinemaController.getAll);
-router.post("/", CinemaController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.cinemas.create),
+  CinemaController.create
+);
 
 /**
  * @swagger
@@ -116,7 +125,17 @@ router.post("/", CinemaController.create);
  *         description: Cinema not found
  */
 router.get("/:id", CinemaController.getById);
-router.patch("/:id", CinemaController.update);
-router.delete("/:id", CinemaController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.cinemas.update),
+  CinemaController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.cinemas.delete),
+  CinemaController.delete
+);
 
 export default router;

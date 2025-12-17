@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import ProductController from "../controllers/product.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -55,7 +59,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", ProductController.getAll);
-router.post("/", ProductController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.products.create),
+  ProductController.create
+);
 
 /**
  * @swagger
@@ -131,7 +140,17 @@ router.post("/", ProductController.create);
  *         description: Product not found
  */
 router.get("/:id", ProductController.getById);
-router.patch("/:id", ProductController.update);
-router.delete("/:id", ProductController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.products.update),
+  ProductController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.products.delete),
+  ProductController.delete
+);
 
 export default router;

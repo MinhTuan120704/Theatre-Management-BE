@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import SeatController from "../controllers/seat.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -50,7 +54,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", SeatController.getAll);
-router.post("/", SeatController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.seats.create),
+  SeatController.create
+);
 
 /**
  * @swagger
@@ -122,8 +131,18 @@ router.post("/", SeatController.create);
  *         description: Seat not found
  */
 router.get("/:id", SeatController.getById);
-router.patch("/:id", SeatController.update);
-router.delete("/:id", SeatController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.seats.update),
+  SeatController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.seats.delete),
+  SeatController.delete
+);
 
 /**
  * @swagger
@@ -144,7 +163,7 @@ router.delete("/:id", SeatController.delete);
  *       404:
  *         description: No seats found for the room
  */
-router.get('/room/:roomId', SeatController.getByRoomId);
+router.get("/room/:roomId", SeatController.getByRoomId);
 
 /**
  * @swagger
@@ -165,6 +184,6 @@ router.get('/room/:roomId', SeatController.getByRoomId);
  *       404:
  *         description: No seats found for the showtime
  */
-router.get('/showtime/:showtimeId', SeatController.getByShowtimeId);
+router.get("/showtime/:showtimeId", SeatController.getByShowtimeId);
 
 export default router;

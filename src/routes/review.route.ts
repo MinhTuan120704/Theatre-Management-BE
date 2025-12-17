@@ -1,6 +1,11 @@
-
 import { Router } from "express";
 import ReviewController from "../controllers/review.controller";
+import {
+  authenticate,
+  requirePermission,
+  optionalAuthenticate,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -54,7 +59,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", ReviewController.getAll);
-router.post("/", ReviewController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.reviews.create),
+  ReviewController.create
+);
 
 /**
  * @swagger
@@ -130,7 +140,7 @@ router.post("/", ReviewController.create);
  *         description: Review not found
  */
 router.get("/:id", ReviewController.getById);
-router.patch("/:id", ReviewController.update);
-router.delete("/:id", ReviewController.delete);
+router.patch("/:id", authenticate, ReviewController.update);
+router.delete("/:id", authenticate, ReviewController.delete);
 
 export default router;

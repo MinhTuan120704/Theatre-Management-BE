@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import ShowTimeController from "../controllers/showtime.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -55,7 +59,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", ShowTimeController.getAll);
-router.post("/", ShowTimeController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.create),
+  ShowTimeController.create
+);
 
 /**
  * @swagger
@@ -131,7 +140,17 @@ router.post("/", ShowTimeController.create);
  *         description: Showtime not found
  */
 router.get("/:id", ShowTimeController.getById);
-router.patch("/:id", ShowTimeController.update);
-router.delete("/:id", ShowTimeController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.update),
+  ShowTimeController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.delete),
+  ShowTimeController.delete
+);
 
 export default router;

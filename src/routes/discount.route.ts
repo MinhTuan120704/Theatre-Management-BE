@@ -1,6 +1,10 @@
-
 import { Router } from "express";
 import DiscountController from "../controllers/discount.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
 
 const router: Router = Router();
 
@@ -64,7 +68,12 @@ const router: Router = Router();
  *         description: Invalid input
  */
 router.get("/", DiscountController.getAll);
-router.post("/", DiscountController.create);
+router.post(
+  "/",
+  authenticate,
+  requirePermission(ResourcePermissions.discounts.create),
+  DiscountController.create
+);
 
 /**
  * @swagger
@@ -148,7 +157,17 @@ router.post("/", DiscountController.create);
  *         description: Discount not found
  */
 router.get("/:id", DiscountController.getById);
-router.patch("/:id", DiscountController.update);
-router.delete("/:id", DiscountController.delete);
+router.patch(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.discounts.update),
+  DiscountController.update
+);
+router.delete(
+  "/:id",
+  authenticate,
+  requirePermission(ResourcePermissions.discounts.delete),
+  DiscountController.delete
+);
 
 export default router;
