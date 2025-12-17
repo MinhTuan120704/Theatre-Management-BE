@@ -6,11 +6,11 @@ export interface OrderCreateDto {
   paidAt?: Date;
   discountId?: number;
   orderedAt: Date;
-  tickets: Array<{
+  tickets?: Array<{
     showtimeId: number;
     seatId: number;
   }>;
-  products: Array<{
+  products?: Array<{
     productId: number;
     quantity: number;
   }>;
