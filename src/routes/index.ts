@@ -1,4 +1,5 @@
 import { Router } from "express";
+import authRoute from "./auth.route";
 import cinemaRoute from "./cinema.route";
 import discountRoute from "./discount.route";
 import employeeRoute from "./employee.route";
@@ -14,6 +15,7 @@ import userRoute from "./user.route";
 
 const router: Router = Router();
 
+router.use("/auth", authRoute);
 router.use("/cinemas", cinemaRoute);
 router.use("/discounts", discountRoute);
 router.use("/employees", employeeRoute);

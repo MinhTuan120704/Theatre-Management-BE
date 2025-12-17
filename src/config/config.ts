@@ -7,6 +7,9 @@ const envSchema = Joi.object({
   PORT: Joi.number().default(3000),
   HOST: Joi.string().required(),
   JWT_SECRET: Joi.string().min(32).required(),
+  JWT_ACCESS_EXPIRATION: Joi.string().default("15m"),
+  JWT_REFRESH_EXPIRATION: Joi.string().default("7d"),
+  JWT_RESET_PASSWORD_EXPIRATION: Joi.string().default("10m"),
 
   //Database
   DB_HOST: Joi.string().required(),
@@ -29,6 +32,12 @@ const config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   host: envVars.HOST,
+  jwt: {
+    secret: envVars.JWT_SECRET,
+    accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION,
+    refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION,
+    resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION,
+  },
   mysql: {
     host: envVars.DB_HOST,
     port: envVars.DB_PORT,
