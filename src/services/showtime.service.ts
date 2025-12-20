@@ -6,8 +6,12 @@ export class ShowtimeService {
     return Showtime.create(data);
   }
 
-  static async getAll() {
-    return Showtime.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await Showtime.findAndCountAll(options);
+    return { showtimes: rows, total: count };
   }
 
   static async getById(showtime_id: number) {

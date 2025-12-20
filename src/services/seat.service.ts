@@ -23,8 +23,12 @@ export class SeatService {
     return Seat.create(data);
   }
 
-  static async getAll() {
-    return Seat.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await Seat.findAndCountAll(options);
+    return { seats: rows, total: count };
   }
 
   static async getById(seat_id: number) {

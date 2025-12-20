@@ -4,8 +4,18 @@ import { ShowtimeService } from '../services/showtime.service';
 export default class ShowTimeController {
   static async getAll(req: Request, res: Response) {
     try {
-      const showtimes = await ShowtimeService.getAll();
-      res.json(showtimes);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await ShowtimeService.getAll(limit, offset);
+      const { showtimes, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ showtimes, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch showtimes' });
     }

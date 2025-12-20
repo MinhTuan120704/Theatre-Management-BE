@@ -61,8 +61,12 @@ export class OrderService {
     }
   }
 
-  static async getAll() {
-    return Order.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await Order.findAndCountAll(options);
+    return { orders: rows, total: count };
   }
 
   static async getById(order_id: number) {
