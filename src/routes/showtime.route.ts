@@ -169,4 +169,34 @@ router.get("/:id", ShowTimeController.getById);
 router.patch("/:id", ShowTimeController.update);
 router.delete("/:id", ShowTimeController.delete);
 
+/**
+ * @swagger
+ * /api/showtimes/searchByMovieId/{movieId}:
+ *   get:
+ *     summary: Get showtimes by movie ID for the next 3 days
+ *     tags: [Showtime]
+ *     parameters:
+ *       - in: path
+ *         name: movieId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Movie ID
+ *     responses:
+ *       200:
+ *         description: List of showtimes for the movie in the next 3 days
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 showtimes:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/showtime/showtime-response.dto.ts'
+ *       404:
+ *         description: No showtimes found for the movie
+ */
+router.get("/searchByMovieId/:movieId", ShowTimeController.searchShowtimebyMovieId);
+
 export default router;

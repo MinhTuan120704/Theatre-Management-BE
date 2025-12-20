@@ -59,4 +59,14 @@ export default class ShowTimeController {
       res.status(500).json({ error: 'Failed to delete showtime' });
     }
   }
+
+  static async searchShowtimebyMovieId(req: Request, res: Response) {
+    try {
+      const movieId = Number(req.params.movieId);
+      const showtimes = await ShowtimeService.searchShowtimebyMovieId(movieId);
+      res.json({ showtimes });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch showtimes by movie ID' });
+    }
+  }
 }
