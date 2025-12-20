@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -45,4 +46,10 @@ export default class ShowTime extends Model {
     allowNull: false,
   })
   declare roomId: number;
+
+  @BelongsTo(() => Movie)
+  movie?: Movie;
+
+  @BelongsTo(() => Room)
+  room?: Room;
 }
