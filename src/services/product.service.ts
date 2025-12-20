@@ -5,8 +5,12 @@ export class ProductService {
     return Product.create(data);
   }
 
-  static async getAll() {
-    return Product.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await Product.findAndCountAll(options);
+    return { products: rows, total: count };
   }
 
   static async getById(product_id: number) {

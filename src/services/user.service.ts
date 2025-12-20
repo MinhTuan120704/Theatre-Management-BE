@@ -10,8 +10,12 @@ export class UserService {
     return User.create(data);
   }
 
-  static async getAll() {
-    return User.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await User.findAndCountAll(options);
+    return { users: rows, total: count };
   }
 
   static async getById(user_id: number) {

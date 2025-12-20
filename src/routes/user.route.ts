@@ -9,9 +9,44 @@ const router: Router = Router();
  *   get:
  *     summary: Get all users
  *     tags: [User]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Number of users to return per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
  *     responses:
  *       200:
- *         description: List of users
+ *         description: List of users with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/user/user-response.dto.ts'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       description: Current page number
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     totalItems:
+ *                       type: integer
+ *                       description: Total number of items
  */
 router.get("/", UserController.getAll);
 /**

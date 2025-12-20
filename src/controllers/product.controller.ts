@@ -4,8 +4,18 @@ import { ProductService } from '../services/product.service';
 export default class ProductController {
   static async getAll(req: Request, res: Response) {
     try {
-      const products = await ProductService.getAll();
-      res.json(products);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await ProductService.getAll(limit, offset);
+      const { products, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ products, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch products' });
     }
