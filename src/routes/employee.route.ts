@@ -1,6 +1,14 @@
-
 import { Router } from "express";
 import EmployeeController from "../controllers/employee.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -84,8 +92,20 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", EmployeeController.getAll);
-router.post("/", EmployeeController.create);
+router.get(
+  "/",
+  readOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.employees.read),
+  EmployeeController.getAll
+);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.employees.create),
+  EmployeeController.create
+);
 
 /**
  * @swagger
@@ -157,8 +177,26 @@ router.post("/", EmployeeController.create);
  *       404:
  *         description: Employee not found
  */
-router.get("/:id", EmployeeController.getById);
-router.patch("/:id", EmployeeController.update);
-router.delete("/:id", EmployeeController.delete);
+router.get(
+  "/:id",
+  readOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.employees.read),
+  EmployeeController.getById
+);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.employees.update),
+  EmployeeController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.employees.delete),
+  EmployeeController.delete
+);
 
 export default router;

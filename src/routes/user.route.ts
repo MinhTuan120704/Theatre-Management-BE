@@ -1,5 +1,15 @@
 import { Router } from "express";
 import UserController from "../controllers/user.controller";
+import {
+  authenticate,
+  requirePermission,
+  authorize,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -48,7 +58,13 @@ const router: Router = Router();
  *                       type: integer
  *                       description: Total number of items
  */
-router.get("/", UserController.getAll);
+router.get(
+  "/",
+  readOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.read),
+  UserController.getAll
+);
 /**
  * @swagger
  * /api/users/{id}:
@@ -68,7 +84,13 @@ router.get("/", UserController.getAll);
  *       404:
  *         description: User not found
  */
-router.get("/:id", UserController.getById);
+router.get(
+  "/:id",
+  readOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.read),
+  UserController.getById
+);
 /**
  * @swagger
  * /api/users/email/{email}:
@@ -88,7 +110,13 @@ router.get("/:id", UserController.getById);
  *       404:
  *         description: User not found
  */
-router.get('/email/:email', UserController.getByEmail);
+router.get(
+  "/email/:email",
+  readOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.read),
+  UserController.getByEmail
+);
 /**
  * @swagger
  * /api/users:
@@ -125,7 +153,13 @@ router.get('/email/:email', UserController.getByEmail);
  *       201:
  *         description: User created
  */
-router.post("/", UserController.create);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.create),
+  UserController.create
+);
 /**
  * @swagger
  * /api/users/{id}:
@@ -175,7 +209,13 @@ router.post("/", UserController.create);
  *       404:
  *         description: User not found
  */
-router.patch("/:id", UserController.update);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.update),
+  UserController.update
+);
 /**
  * @swagger
  * /api/users/{id}:
@@ -195,6 +235,12 @@ router.patch("/:id", UserController.update);
  *       404:
  *         description: User not found
  */
-router.delete("/:id", UserController.delete);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.users.delete),
+  UserController.delete
+);
 
 export default router;

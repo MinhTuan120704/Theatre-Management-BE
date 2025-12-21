@@ -1,6 +1,14 @@
-
 import { Router } from "express";
-import ShowTimeController from "../controllers/showtime.controller";
+import ShowtimeController from "../controllers/showtime.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -89,8 +97,14 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", ShowTimeController.getAll);
-router.post("/", ShowTimeController.create);
+router.get("/", readOperationLimiter, ShowTimeController.getAll);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.create),
+  ShowTimeController.create
+);
 
 /**
  * @swagger
@@ -165,9 +179,21 @@ router.post("/", ShowTimeController.create);
  *       404:
  *         description: Showtime not found
  */
-router.get("/:id", ShowTimeController.getById);
-router.patch("/:id", ShowTimeController.update);
-router.delete("/:id", ShowTimeController.delete);
+router.get("/:id", readOperationLimiter, ShowTimeController.getById);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.update),
+  ShowTimeController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.showtimes.delete),
+  ShowTimeController.delete
+);
 
 /**
  * @swagger
@@ -197,6 +223,10 @@ router.delete("/:id", ShowTimeController.delete);
  *       404:
  *         description: No showtimes found for the movie
  */
-router.get("/searchByMovieId/:movieId", ShowTimeController.searchShowtimebyMovieId);
+router.get(
+  "/searchByMovieId/:movieId",
+  readOperationLimiter,
+  ShowTimeController.searchShowtimebyMovieId
+);
 
 export default router;

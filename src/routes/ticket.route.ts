@@ -1,6 +1,15 @@
-
 import { Router } from "express";
 import TicketController from "../controllers/ticket.controller";
+import {
+  authenticate,
+  requirePermission,
+  requireAnyPermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -71,10 +80,46 @@ const router: Router = Router();
  *         description: Invalid input
  */
 
-router.get("/", TicketController.getAll);
-router.post("/", TicketController.create);
-router.get("/:id", TicketController.getById);
-router.patch("/:id", TicketController.update);
-router.delete("/:id", TicketController.delete);
+router.get(
+  "/",
+  readOperationLimiter,
+  authenticate,
+  requireAnyPermission(
+    ResourcePermissions.tickets.read,
+    ResourcePermissions.tickets.readOwn
+  ),
+  TicketController.getAll
+);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.tickets.create),
+  TicketController.create
+);
+router.get(
+  "/:id",
+  readOperationLimiter,
+  authenticate,
+  requireAnyPermission(
+    ResourcePermissions.tickets.read,
+    ResourcePermissions.tickets.readOwn
+  ),
+  TicketController.getById
+);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.tickets.update),
+  TicketController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.tickets.delete),
+  TicketController.delete
+);
 
 export default router;

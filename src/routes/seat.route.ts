@@ -1,6 +1,14 @@
-
 import { Router } from "express";
 import SeatController from "../controllers/seat.controller";
+import {
+  authenticate,
+  requirePermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -84,8 +92,14 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", SeatController.getAll);
-router.post("/", SeatController.create);
+router.get("/", readOperationLimiter, SeatController.getAll);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.seats.create),
+  SeatController.create
+);
 
 /**
  * @swagger
@@ -156,9 +170,21 @@ router.post("/", SeatController.create);
  *       404:
  *         description: Seat not found
  */
-router.get("/:id", SeatController.getById);
-router.patch("/:id", SeatController.update);
-router.delete("/:id", SeatController.delete);
+router.get("/:id", readOperationLimiter, SeatController.getById);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.seats.update),
+  SeatController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.seats.delete),
+  SeatController.delete
+);
 
 /**
  * @swagger
@@ -179,7 +205,7 @@ router.delete("/:id", SeatController.delete);
  *       404:
  *         description: No seats found for the room
  */
-router.get('/room/:roomId', SeatController.getByRoomId);
+router.get("/room/:roomId", readOperationLimiter, SeatController.getByRoomId);
 
 /**
  * @swagger
@@ -200,6 +226,10 @@ router.get('/room/:roomId', SeatController.getByRoomId);
  *       404:
  *         description: No seats found for the showtime
  */
-router.get('/showtime/:showtimeId', SeatController.getByShowtimeId);
+router.get(
+  "/showtime/:showtimeId",
+  readOperationLimiter,
+  SeatController.getByShowtimeId
+);
 
 export default router;

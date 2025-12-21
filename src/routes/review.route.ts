@@ -1,6 +1,15 @@
-
 import { Router } from "express";
 import ReviewController from "../controllers/review.controller";
+import {
+  authenticate,
+  requirePermission,
+  optionalAuthenticate,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -88,8 +97,14 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", ReviewController.getAll);
-router.post("/", ReviewController.create);
+router.get("/", readOperationLimiter, ReviewController.getAll);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.reviews.create),
+  ReviewController.create
+);
 
 /**
  * @swagger
@@ -164,8 +179,18 @@ router.post("/", ReviewController.create);
  *       404:
  *         description: Review not found
  */
-router.get("/:id", ReviewController.getById);
-router.patch("/:id", ReviewController.update);
-router.delete("/:id", ReviewController.delete);
+router.get("/:id", readOperationLimiter, ReviewController.getById);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  ReviewController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  ReviewController.delete
+);
 
 export default router;

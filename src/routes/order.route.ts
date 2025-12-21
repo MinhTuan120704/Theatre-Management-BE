@@ -1,6 +1,15 @@
-
 import { Router } from "express";
 import OrderController from "../controllers/order.controller";
+import {
+  authenticate,
+  requirePermission,
+  requireAnyPermission,
+} from "../middlewares/auth.middleware";
+import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -124,8 +133,23 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", OrderController.getAll);
-router.post("/", OrderController.create);
+router.get(
+  "/",
+  readOperationLimiter,
+  authenticate,
+  requireAnyPermission(
+    ResourcePermissions.orders.read,
+    ResourcePermissions.orders.readOwn
+  ),
+  OrderController.getAll
+);
+router.post(
+  "/",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.orders.create),
+  OrderController.create
+);
 
 /**
  * @swagger
@@ -213,9 +237,30 @@ router.post("/", OrderController.create);
  *       404:
  *         description: Order not found
  */
-router.get("/:id", OrderController.getById);
-router.patch("/:id", OrderController.update);
-router.delete("/:id", OrderController.delete);
+router.get(
+  "/:id",
+  readOperationLimiter,
+  authenticate,
+  requireAnyPermission(
+    ResourcePermissions.orders.read,
+    ResourcePermissions.orders.readOwn
+  ),
+  OrderController.getById
+);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.orders.update),
+  OrderController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.orders.delete),
+  OrderController.delete
+);
 
 /**
  * @swagger
@@ -236,6 +281,15 @@ router.delete("/:id", OrderController.delete);
  *       404:
  *         description: No orders found for the user
  */
-router.get('/user/:userId', OrderController.getOrderByUserId);
+router.get(
+  "/user/:userId",
+  readOperationLimiter,
+  authenticate,
+  requireAnyPermission(
+    ResourcePermissions.orders.read,
+    ResourcePermissions.orders.readOwn
+  ),
+  OrderController.getOrderByUserId
+);
 
 export default router;
