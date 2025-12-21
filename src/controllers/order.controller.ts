@@ -13,8 +13,18 @@ export default class OrderController {
   }
   static async getAll(req: Request, res: Response) {
     try {
-      const orders = await OrderService.getAll();
-      res.json(orders);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await OrderService.getAll(limit, offset);
+      const { orders, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ orders, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch orders' });
     }

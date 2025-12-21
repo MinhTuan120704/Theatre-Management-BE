@@ -5,8 +5,12 @@ export class TicketService {
     return Ticket.create(data);
   }
 
-  static async getAll() {
-    return Ticket.findAll();
+  static async getAll(limit?: number, offset?: number) {
+    const options: any = {};
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset;
+    const { count, rows } = await Ticket.findAndCountAll(options);
+    return { tickets: rows, total: count };
   }
 
   static async getById(ticket_id: number) {

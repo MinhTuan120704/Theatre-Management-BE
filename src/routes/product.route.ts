@@ -21,9 +21,44 @@ const router: Router = Router();
  *   get:
  *     summary: Get all products
  *     tags: [Product]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Number of products to return per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
  *     responses:
  *       200:
- *         description: List of all products
+ *         description: List of products with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/product/product-response.dto.ts'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       description: Current page number
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     totalItems:
+ *                       type: integer
+ *                       description: Total number of items
  *   post:
  *     summary: Create a new product
  *     tags: [Product]

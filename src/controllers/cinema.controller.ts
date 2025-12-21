@@ -4,8 +4,18 @@ import { CinemaService } from '../services/cinema.service';
 export default class CinemaController {
   static async getAll(req: Request, res: Response) {
     try {
-      const cinemas = await CinemaService.getAll();
-      res.json(cinemas);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await CinemaService.getAll(limit, offset);
+      const { cinemas, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ cinemas, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch cinemas' });
     }

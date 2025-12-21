@@ -4,8 +4,18 @@ import { EmployeeService } from '../services/employee.service';
 export default class EmployeeController {
   static async getAll(req: Request, res: Response) {
     try {
-      const employees = await EmployeeService.getAll();
-      res.json(employees);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await EmployeeService.getAll(limit, offset);
+      const { employees, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ employees, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch employees' });
     }

@@ -4,8 +4,18 @@ import { ReviewService } from '../services/review.service';
 export default class ReviewController {
   static async getAll(req: Request, res: Response) {
     try {
-      const reviews = await ReviewService.getAll();
-      res.json(reviews);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const offset = limit ? (page - 1) * limit : undefined;
+      const result = await ReviewService.getAll(limit, offset);
+      const { reviews, total } = result;
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+      const pagination = {
+        currentPage: page,
+        totalPages,
+        totalItems: total
+      };
+      res.json({ reviews, pagination });
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch reviews' });
     }

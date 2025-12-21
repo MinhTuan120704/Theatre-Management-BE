@@ -22,9 +22,44 @@ const router: Router = Router();
  *   get:
  *     summary: Get all reviews
  *     tags: [Review]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Number of reviews to return per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
  *     responses:
  *       200:
- *         description: List of all reviews
+ *         description: List of reviews with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 reviews:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/review/review-response.dto.ts'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       description: Current page number
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     totalItems:
+ *                       type: integer
+ *                       description: Total number of items
  *   post:
  *     summary: Create a new review
  *     tags: [Review]

@@ -21,9 +21,44 @@ const router: Router = Router();
  *   get:
  *     summary: Get all cinemas
  *     tags: [Cinema]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Number of cinemas to return per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
  *     responses:
  *       200:
- *         description: List of all cinemas
+ *         description: List of cinemas with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 cinemas:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/cinema/cinema-response.dto.ts'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       description: Current page number
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     totalItems:
+ *                       type: integer
+ *                       description: Total number of items
  *   post:
  *     summary: Create a new cinema
  *     tags: [Cinema]
