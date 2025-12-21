@@ -6,6 +6,10 @@ import {
   optionalAuthenticate,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -93,9 +97,10 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", ReviewController.getAll);
+router.get("/", readOperationLimiter, ReviewController.getAll);
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.reviews.create),
   ReviewController.create
@@ -174,8 +179,18 @@ router.post(
  *       404:
  *         description: Review not found
  */
-router.get("/:id", ReviewController.getById);
-router.patch("/:id", authenticate, ReviewController.update);
-router.delete("/:id", authenticate, ReviewController.delete);
+router.get("/:id", readOperationLimiter, ReviewController.getById);
+router.patch(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  ReviewController.update
+);
+router.delete(
+  "/:id",
+  writeOperationLimiter,
+  authenticate,
+  ReviewController.delete
+);
 
 export default router;

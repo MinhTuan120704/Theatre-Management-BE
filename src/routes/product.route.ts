@@ -5,6 +5,10 @@ import {
   requirePermission,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -93,9 +97,10 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", ProductController.getAll);
+router.get("/", readOperationLimiter, ProductController.getAll);
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.products.create),
   ProductController.create
@@ -174,15 +179,17 @@ router.post(
  *       404:
  *         description: Product not found
  */
-router.get("/:id", ProductController.getById);
+router.get("/:id", readOperationLimiter, ProductController.getById);
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.products.update),
   ProductController.update
 );
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.products.delete),
   ProductController.delete

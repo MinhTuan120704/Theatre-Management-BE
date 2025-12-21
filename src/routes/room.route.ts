@@ -5,6 +5,10 @@ import {
   requirePermission,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -99,9 +103,10 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", RoomController.getAll);
+router.get("/", readOperationLimiter, RoomController.getAll);
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.rooms.create),
   RoomController.create
@@ -177,15 +182,17 @@ router.post(
  *       404:
  *         description: Room not found
  */
-router.get("/:id", RoomController.getById);
+router.get("/:id", readOperationLimiter, RoomController.getById);
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.rooms.update),
   RoomController.update
 );
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.rooms.delete),
   RoomController.delete

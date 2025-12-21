@@ -6,6 +6,10 @@ import {
   authorize,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -56,6 +60,7 @@ const router: Router = Router();
  */
 router.get(
   "/",
+  readOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.read),
   UserController.getAll
@@ -81,6 +86,7 @@ router.get(
  */
 router.get(
   "/:id",
+  readOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.read),
   UserController.getById
@@ -106,6 +112,7 @@ router.get(
  */
 router.get(
   "/email/:email",
+  readOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.read),
   UserController.getByEmail
@@ -148,6 +155,7 @@ router.get(
  */
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.create),
   UserController.create
@@ -203,6 +211,7 @@ router.post(
  */
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.update),
   UserController.update
@@ -228,6 +237,7 @@ router.patch(
  */
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.users.delete),
   UserController.delete

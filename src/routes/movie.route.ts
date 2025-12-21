@@ -5,6 +5,10 @@ import {
   requirePermission,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -121,9 +125,10 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", MovieController.getAll);
+router.get("/", readOperationLimiter, MovieController.getAll);
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.movies.create),
   MovieController.create
@@ -225,15 +230,17 @@ router.post(
  *       404:
  *         description: Movie not found
  */
-router.get("/:id", MovieController.getById);
+router.get("/:id", readOperationLimiter, MovieController.getById);
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.movies.update),
   MovieController.update
 );
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.movies.delete),
   MovieController.delete

@@ -1,5 +1,13 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
+import {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  refreshTokenLimiter,
+  passwordChangeLimiter,
+  authGeneralLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -44,7 +52,7 @@ const router: Router = Router();
  *       400:
  *         description: Bad request
  */
-router.post("/register", AuthController.register);
+router.post("/register", registerLimiter, AuthController.register);
 
 /**
  * @swagger
@@ -72,7 +80,7 @@ router.post("/register", AuthController.register);
  *       401:
  *         description: Unauthorized
  */
-router.post("/login", AuthController.login);
+router.post("/login", loginLimiter, AuthController.login);
 
 /**
  * @swagger
@@ -97,7 +105,7 @@ router.post("/login", AuthController.login);
  *       400:
  *         description: Bad request
  */
-router.post("/logout", AuthController.logout);
+router.post("/logout", authGeneralLimiter, AuthController.logout);
 
 /**
  * @swagger
@@ -122,7 +130,7 @@ router.post("/logout", AuthController.logout);
  *       401:
  *         description: Unauthorized
  */
-router.post("/refresh-token", AuthController.refreshToken);
+router.post("/refresh-token", refreshTokenLimiter, AuthController.refreshToken);
 
 /**
  * @swagger
@@ -147,7 +155,11 @@ router.post("/refresh-token", AuthController.refreshToken);
  *       400:
  *         description: Bad request
  */
-router.post("/request-password-reset", AuthController.requestPasswordReset);
+router.post(
+  "/request-password-reset",
+  passwordResetLimiter,
+  AuthController.requestPasswordReset
+);
 
 /**
  * @swagger
@@ -175,7 +187,11 @@ router.post("/request-password-reset", AuthController.requestPasswordReset);
  *       400:
  *         description: Bad request
  */
-router.post("/reset-password", AuthController.resetPassword);
+router.post(
+  "/reset-password",
+  passwordResetLimiter,
+  AuthController.resetPassword
+);
 
 /**
  * @swagger
@@ -207,7 +223,11 @@ router.post("/reset-password", AuthController.resetPassword);
  *       401:
  *         description: Unauthorized
  */
-router.post("/change-password", AuthController.changePassword);
+router.post(
+  "/change-password",
+  passwordChangeLimiter,
+  AuthController.changePassword
+);
 
 /**
  * @swagger
@@ -223,7 +243,7 @@ router.post("/change-password", AuthController.changePassword);
  *       401:
  *         description: Unauthorized
  */
-router.post("/logout-all", AuthController.logoutAllDevices);
+router.post("/logout-all", authGeneralLimiter, AuthController.logoutAllDevices);
 
 /**
  * @swagger
@@ -248,6 +268,6 @@ router.post("/logout-all", AuthController.logoutAllDevices);
  *       401:
  *         description: Invalid token
  */
-router.post("/verify-token", AuthController.verifyToken);
+router.post("/verify-token", authGeneralLimiter, AuthController.verifyToken);
 
 export default router;

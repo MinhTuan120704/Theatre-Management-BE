@@ -6,6 +6,10 @@ import {
   requireAnyPermission,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -131,6 +135,7 @@ const router: Router = Router();
  */
 router.get(
   "/",
+  readOperationLimiter,
   authenticate,
   requireAnyPermission(
     ResourcePermissions.orders.read,
@@ -140,6 +145,7 @@ router.get(
 );
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.orders.create),
   OrderController.create
@@ -233,6 +239,7 @@ router.post(
  */
 router.get(
   "/:id",
+  readOperationLimiter,
   authenticate,
   requireAnyPermission(
     ResourcePermissions.orders.read,
@@ -242,12 +249,14 @@ router.get(
 );
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.orders.update),
   OrderController.update
 );
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.orders.delete),
   OrderController.delete
@@ -274,6 +283,7 @@ router.delete(
  */
 router.get(
   "/user/:userId",
+  readOperationLimiter,
   authenticate,
   requireAnyPermission(
     ResourcePermissions.orders.read,

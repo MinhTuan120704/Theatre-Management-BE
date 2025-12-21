@@ -5,6 +5,10 @@ import {
   requirePermission,
 } from "../middlewares/auth.middleware";
 import { ResourcePermissions } from "../config/permissions";
+import {
+  readOperationLimiter,
+  writeOperationLimiter,
+} from "../middlewares/rateLimiter.middleware";
 
 const router: Router = Router();
 
@@ -102,9 +106,10 @@ const router: Router = Router();
  *       400:
  *         description: Invalid input
  */
-router.get("/", DiscountController.getAll);
+router.get("/", readOperationLimiter, DiscountController.getAll);
 router.post(
   "/",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.discounts.create),
   DiscountController.create
@@ -191,15 +196,17 @@ router.post(
  *       404:
  *         description: Discount not found
  */
-router.get("/:id", DiscountController.getById);
+router.get("/:id", readOperationLimiter, DiscountController.getById);
 router.patch(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.discounts.update),
   DiscountController.update
 );
 router.delete(
   "/:id",
+  writeOperationLimiter,
   authenticate,
   requirePermission(ResourcePermissions.discounts.delete),
   DiscountController.delete
