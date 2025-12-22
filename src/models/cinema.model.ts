@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, Model, Table, HasMany } from "sequelize-typescript";
+import Room from "./room.model";
 
 @Table({
   tableName: "cinema",
@@ -23,4 +24,7 @@ export default class Cinema extends Model {
     allowNull: false,
   })
   declare address: string;
+
+  @HasMany(() => Room)
+  rooms?: Room[];
 }

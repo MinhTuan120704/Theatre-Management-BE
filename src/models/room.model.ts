@@ -5,8 +5,10 @@ import {
   ForeignKey,
   Model,
   Table,
+  HasMany,
 } from "sequelize-typescript";
 import Cinema from "./cinema.model";
+import ShowTime from "./showTime.model";
 
 @Table({
   tableName: "room",
@@ -41,4 +43,7 @@ export default class Room extends Model {
 
   @BelongsTo(() => Cinema)
   cinema?: Cinema;
+
+  @HasMany(() => ShowTime)
+  showTimes?: ShowTime[];
 }
