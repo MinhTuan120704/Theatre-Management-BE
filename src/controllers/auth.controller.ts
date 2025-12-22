@@ -41,14 +41,14 @@ export default class AuthController {
       };
 
       res.status(201).json({
-        message: "User registered successfully",
+        message: "Sign up successfully",
         user: userResponse,
         tokens: result.tokens,
       });
     } catch (error: any) {
       res
         .status(400)
-        .json({ error: error.message || "Failed to register user" });
+        .json({ error: error.message || "Your entered email had existed in the system. Please check again." });
     }
   }
 
@@ -81,12 +81,12 @@ export default class AuthController {
       };
 
       res.json({
-        message: "Login successful",
+        message: "Sign in successfully",
         user: userResponse,
         tokens: result.tokens,
       });
     } catch (error: any) {
-      res.status(401).json({ error: error.message || "Failed to login" });
+      res.status(401).json({ error: error.message || "Your username or password might be wrong. Please check and try again later." });
     }
   }
 
