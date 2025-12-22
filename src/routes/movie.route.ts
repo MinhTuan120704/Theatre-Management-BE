@@ -230,7 +230,37 @@ router.post(
  *       404:
  *         description: Movie not found
  */
+
+/**
+ * @swagger
+ * /api/movies/cinema/{cinemaId}:
+ *   get:
+ *     summary: Get movies by cinema ID with upcoming showtimes
+ *     tags: [Movie]
+ *     parameters:
+ *       - in: path
+ *         name: cinemaId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Cinema ID
+ *     responses:
+ *       200:
+ *         description: List of movies with upcoming showtimes in the cinema
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/movie/movie-response.dto.ts'
+ *       500:
+ *         description: Internal server error
+ */
 router.get("/:id", readOperationLimiter, MovieController.getById);
+router.get("/cinema/:cinemaId", readOperationLimiter, MovieController.getMoviesByCinemaId);
 router.patch(
   "/:id",
   writeOperationLimiter,

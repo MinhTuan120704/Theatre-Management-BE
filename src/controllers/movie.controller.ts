@@ -59,4 +59,14 @@ export default class MovieController {
       res.status(500).json({ error: 'Failed to delete movie' });
     }
   }
+
+  static async getMoviesByCinemaId(req: Request, res: Response) {
+    try {
+      const cinemaId = Number(req.params.cinemaId);
+      const movies = await MovieService.getMoviesByCinemaId(cinemaId);
+      res.json({ movies });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch movies by cinema' });
+    }
+  }
 }

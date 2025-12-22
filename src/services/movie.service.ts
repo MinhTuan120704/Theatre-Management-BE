@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
 import Movie from '../models/movie.model';
+import ShowTime from '../models/showTime.model';
+import Room from '../models/room.model';
 
 export class MovieService {
   static async create(data: any) {
@@ -33,5 +35,39 @@ export class MovieService {
     if (!movie) return null;
     await movie.destroy();
     return true;
+  }
+
+  static async getMoviesByCinemaId(cinemaId: number) {
+    const now = new Date();
+    const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const showTimes = await ShowTime.findAll({
+      where: {
+        showTime: {
+          [Op.gte]: now,
+          [Op.lte]: sevenDaysLater
+        }
+      },
+      include: [
+        {
+          model: Room,
+          where: { cinemaId },
+          attributes: []
+        },
+        {
+          model: Movie,
+          attributes: []
+        }
+      ]
+    });
+
+    const movieIds = [...new Set(showTimes.map(st => st.movieId))];
+
+    const movies = await Movie.findAll({
+      where: { id: movieIds },
+      attributes: { exclude: ['createdAt', 'updatedAt'] }
+    });
+
+    return movies;
   }
 }

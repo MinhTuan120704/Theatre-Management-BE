@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, Model, Table, HasMany } from "sequelize-typescript";
+import ShowTime from "./showTime.model";
 
 @Table({
   tableName: "movie",
@@ -71,4 +72,7 @@ export default class Movie extends Model {
     allowNull: true,
   })
   declare trailerUrl: string;
+
+  @HasMany(() => ShowTime)
+  showTimes?: ShowTime[];
 }

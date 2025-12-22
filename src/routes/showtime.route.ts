@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ShowtimeController from "../controllers/showtime.controller";
+import ShowTimeController from "../controllers/showtime.controller";
 import {
   authenticate,
   requirePermission,
