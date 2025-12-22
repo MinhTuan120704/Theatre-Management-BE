@@ -69,4 +69,17 @@ export default class ShowTimeController {
       res.status(500).json({ error: 'Failed to fetch showtimes by movie ID' });
     }
   }
+
+  static async getShowtimesByCinemaMovieDate(req: Request, res: Response) {
+    try {
+      const { cinemaId, movieId, date } = req.params;
+      if (!cinemaId || !movieId || !date) {
+        return res.status(400).json({ error: 'Missing required parameters: cinemaId, movieId, date' });
+      }
+      const showtimes = await ShowtimeService.getShowtimesByCinemaMovieDate(Number(cinemaId), Number(movieId), date);
+      res.json({ showtimes });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch showtimes by cinema, movie, and date' });
+    }
+  }
 }
