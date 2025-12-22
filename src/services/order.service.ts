@@ -1,6 +1,14 @@
 import Order from '../models/order.model';
 import OrderProductDetails from '../models/orderProductDetails.model';
 import Ticket from '../models/ticket.model';
+import User from '../models/user.model';
+import Movie from '../models/movie.model';
+import Cinema from '../models/cinema.model';
+import Room from '../models/room.model';
+import Seat from '../models/seat.model';
+import Product from '../models/product.model';
+import Showtime from '../models/showTime.model';
+import EmailService from './email.service';
 const SeatService = require('./seat.service').SeatService;
 
 export class OrderService {
@@ -54,6 +62,72 @@ export class OrderService {
       }
 
       await transaction?.commit();
+
+      // Gửi email xác nhận
+      try {
+        const user = await User.findByPk(orderData.userId);
+        if (user && user.email) {
+          // Lấy thông tin showtime (giả sử tất cả tickets cùng showtime)
+          const showtimeId = tickets[0]?.showtimeId;
+          let showtime = null as any;
+          if (showtimeId) {
+            showtime = await Showtime.findByPk(showtimeId);
+          }
+
+          // Nếu associations không được populate, fetch riêng
+          let movie = null as any;
+          let room = null as any;
+          let cinema = null as any;
+          if (showtime) {
+            if (showtime.movieId) {
+              movie = await Movie.findByPk(showtime.movieId, { attributes: ['title'] });
+            }
+            if (showtime.roomId) {
+              room = await Room.findByPk(showtime.roomId, { attributes: ['name', 'cinemaId'] });
+              if (room && room.cinemaId) {
+                cinema = await Cinema.findByPk(room.cinemaId, { attributes: ['name', 'address'] });
+              }
+            }
+          }
+
+          // Lấy danh sách vé
+          const ticketDetails: Array<any> = [];
+          for (const t of tickets) {
+            const seat = await Seat.findByPk(t.seatId, { attributes: ['seatNumber'] });
+            ticketDetails.push({ seat: seat?.seatNumber || 'Unknown', price: showtime?.price || 0 });
+          }
+
+          // Lấy danh sách sản phẩm
+          const productDetails: Array<any> = [];
+          if (products && Array.isArray(products)) {
+            for (const prod of products) {
+              const product = await Product.findByPk(prod.productId, { attributes: ['name', 'price'] });
+              if (product) {
+                productDetails.push({ name: product.name, quantity: prod.quantity, price: product.price });
+              }
+            }
+          }
+
+          const orderDetails = {
+            customerName: user?.fullName || user?.email || 'Khách hàng',
+            movieTitle: movie?.title || 'Unknown',
+            cinemaName: cinema?.name || 'Unknown',
+            cinemaAddress: cinema?.address || 'Unknown',
+            roomName: room?.name || 'Unknown',
+            ticketPrice: showtime?.price || 0,
+            showtime: showtime ? new Date(showtime.showTime).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) : 'Unknown',
+            tickets: ticketDetails,
+            products: productDetails,
+            totalPrice: (newOrder && (newOrder as any).totalPrice) || orderData.totalPrice || 0,
+          };
+
+          await EmailService.sendBookingConfirmation(user.email, orderDetails);
+        }
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Không throw error để không làm fail order
+      }
+
       return newOrder;
     } catch (error) {
       await transaction?.rollback();
