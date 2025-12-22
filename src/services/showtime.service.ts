@@ -61,6 +61,35 @@ export class ShowtimeService {
       ]
     });
   }
+
+  static async getShowtimesByCinemaMovieDate(cinemaId: number, movieId: number, date: string) {
+    const startOfDay = new Date(date + 'T00:00:00.000Z');
+    const endOfDay = new Date(date + 'T23:59:59.999Z');
+
+    return Showtime.findAll({
+      where: {
+        movieId,
+        showTime: {
+          [Op.gte]: startOfDay,
+          [Op.lte]: endOfDay
+        }
+      },
+      include: [
+        {
+          model: Room,
+          where: { cinemaId },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [
+            {
+              model: Cinema,
+              attributes: { exclude: ['createdAt', 'updatedAt'] }
+            }
+          ]
+        }
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt'] }
+    });
+  }
 }
 
 export default ShowtimeService;

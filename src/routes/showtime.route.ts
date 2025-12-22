@@ -223,10 +223,57 @@ router.delete(
  *       404:
  *         description: No showtimes found for the movie
  */
+
+/**
+ * @swagger
+ * /api/showtimes/cinema/{cinemaId}/movie/{movieId}/date/{date}:
+ *   get:
+ *     summary: Get showtimes by cinema, movie, and date
+ *     tags: [Showtime]
+ *     parameters:
+ *       - in: path
+ *         name: cinemaId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Cinema ID
+ *       - in: path
+ *         name: movieId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Movie ID
+ *       - in: path
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: true
+ *         description: Date in YYYY-MM-DD format
+ *     responses:
+ *       200:
+ *         description: List of showtimes for the specified cinema, movie, and date
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 showtimes:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/showtime/showtime-response.dto.ts'
+ *       500:
+ *         description: Internal server error
+ */
 router.get(
   "/searchByMovieId/:movieId",
   readOperationLimiter,
   ShowTimeController.searchShowtimebyMovieId
+);
+router.get(
+  "/cinema/:cinemaId/movie/:movieId/date/:date",
+  readOperationLimiter,
+  ShowTimeController.getShowtimesByCinemaMovieDate
 );
 
 export default router;
