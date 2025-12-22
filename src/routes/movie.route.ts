@@ -259,6 +259,55 @@ router.post(
  *       500:
  *         description: Internal server error
  */
+
+/**
+ * @swagger
+ * /api/movies/upcoming:
+ *   get:
+ *     summary: Get upcoming movies
+ *     tags: [Movie]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Number of movies to return per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *     responses:
+ *       200:
+ *         description: List of upcoming movies with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 movies:
+ *                   type: array
+ *                   items:
+ *                     $ref: 'src/models/dto/movie/movie-response.dto.ts'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       description: Current page number
+ *                     totalPages:
+ *                       type: integer
+ *                       description: Total number of pages
+ *                     totalItems:
+ *                       type: integer
+ *                       description: Total number of items
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/upcoming", readOperationLimiter, MovieController.getUpcoming);
 router.get("/:id", readOperationLimiter, MovieController.getById);
 router.get("/cinema/:cinemaId", readOperationLimiter, MovieController.getMoviesByCinemaId);
 router.patch(
