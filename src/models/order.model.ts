@@ -1,12 +1,16 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import User from "./user.model";
 import Discount from "./discount.model";
+import Ticket from "./ticket.model";
+import OrderProductDetails from "./orderProductDetails.model";
 
 @Table({
   tableName: "order",
@@ -49,6 +53,12 @@ export default class Order extends Model {
   @Column({
     type: DataType.DATE,
     allowNull: true,
+  })
+  declare reservationExpiresAt: Date | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
     defaultValue: DataType.NOW,
   })
   declare paidAt: Date;
@@ -66,4 +76,17 @@ export default class Order extends Model {
     defaultValue: DataType.NOW,
   })
   declare orderedAt: Date;
+
+  // Associations
+  @BelongsTo(() => User)
+  user?: User;
+
+  @BelongsTo(() => Discount)
+  discount?: Discount;
+
+  @HasMany(() => Ticket)
+  tickets?: Ticket[];
+
+  @HasMany(() => OrderProductDetails)
+  orderProductDetails?: OrderProductDetails[];
 }

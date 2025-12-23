@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import Order from "./order.model";
 
 @Table({
   tableName: "discount",
@@ -48,4 +49,8 @@ export default class Discount extends Model {
     allowNull: false,
   })
   declare expiryDate: Date;
+
+  // Associations
+  @HasMany(() => Order)
+  orders?: Order[];
 }

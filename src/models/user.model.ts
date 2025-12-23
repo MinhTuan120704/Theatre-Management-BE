@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import Order from "./order.model";
 
 @Table({
   tableName: "users",
@@ -57,4 +58,8 @@ export default class User extends Model {
     defaultValue: "customer",
   })
   declare role: "customer" | "admin" | "employee";
+
+  // Associations
+  @HasMany(() => Order)
+  orders?: Order[];
 }

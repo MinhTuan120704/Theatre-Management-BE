@@ -3,11 +3,13 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import Movie from "./movie.model";
 import Room from "./room.model";
+import Ticket from "./ticket.model";
 
 @Table({
   tableName: "show_time",
@@ -52,4 +54,7 @@ export default class ShowTime extends Model {
 
   @BelongsTo(() => Room)
   room?: Room;
+
+  @HasMany(() => Ticket)
+  tickets?: Ticket[];
 }

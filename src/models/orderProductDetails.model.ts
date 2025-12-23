@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -34,4 +35,11 @@ export default class OrderProductDetails extends Model {
     allowNull: false,
   })
   declare quantity: number;
+
+  // Associations
+  @BelongsTo(() => Order)
+  order?: Order;
+
+  @BelongsTo(() => Product)
+  product?: Product;
 }

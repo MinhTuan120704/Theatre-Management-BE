@@ -32,25 +32,45 @@ const router: Router = Router();
  *             properties:
  *               fullName:
  *                 type: string
+ *                 example: Nguyen Van A
  *               email:
  *                 type: string
+ *                 example: user@example.com
  *               phone:
  *                 type: string
+ *                 example: "0123456789"
  *               password:
  *                 type: string
+ *                 example: password123
  *               dob:
  *                 type: string
  *                 format: date
+ *                 example: "1990-01-01"
  *               identifyCode:
  *                 type: string
+ *                 example: "123456789012"
  *               role:
  *                 type: string
  *                 enum: [customer, admin, employee]
+ *                 default: customer
  *     responses:
  *       201:
  *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 user:
+ *                   type: object
  *       400:
- *         description: Bad request
+ *         description: Bad request - Email or phone already exists
+ *       429:
+ *         description: Too many registration attempts
  */
 router.post("/register", registerLimiter, AuthController.register);
 
@@ -59,6 +79,7 @@ router.post("/register", registerLimiter, AuthController.register);
  * /api/auth/login:
  *   post:
  *     summary: Login user
+ *     description: Login to get access token. Copy the accessToken from response and use "Authorize" button at the top to set Bearer token for authenticated endpoints.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -72,13 +93,39 @@ router.post("/register", registerLimiter, AuthController.register);
  *             properties:
  *               email:
  *                 type: string
+ *                 example: user@example.com
  *               password:
  *                 type: string
+ *                 example: password123
  *     responses:
  *       200:
  *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token (copy this and click Authorize button)
+ *                 refreshToken:
+ *                   type: string
+ *                   description: JWT refresh token
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                     email:
+ *                       type: string
+ *                     fullName:
+ *                       type: string
+ *                     role:
+ *                       type: string
  *       401:
- *         description: Unauthorized
+ *         description: Invalid credentials
+ *       429:
+ *         description: Too many login attempts
  */
 router.post("/login", loginLimiter, AuthController.login);
 
