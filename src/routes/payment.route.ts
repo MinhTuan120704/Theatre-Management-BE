@@ -21,6 +21,7 @@ const router: Router = Router();
  * /api/payments/{orderId}/process:
  *   post:
  *     summary: Process payment for an order
+ *     description: Process payment for an order. Use isSuccess to control payment result (for testing purposes).
  *     tags: [Payment]
  *     security:
  *       - bearerAuth: []
@@ -44,9 +45,25 @@ const router: Router = Router();
  *                 type: string
  *                 enum: [credit_card, paypal, cash]
  *                 description: Payment method to use
+ *                 example: credit_card
+ *               isSuccess:
+ *                 type: boolean
+ *                 description: Control payment result (true = success, false = fail). Default is true.
+ *                 example: true
  *     responses:
  *       200:
  *         description: Payment processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 orderId:
+ *                   type: number
  *       400:
  *         description: Payment failed or invalid request
  *       401:

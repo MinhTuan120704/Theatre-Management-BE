@@ -35,13 +35,6 @@ export default class Seat extends Model {
   })
   declare seatNumber: string;
 
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  declare isReserved: boolean;
-
   // Associations
   @BelongsTo(() => Room)
   room?: Room;

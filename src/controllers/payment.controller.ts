@@ -8,15 +8,18 @@ export default class PaymentController {
   static async processPayment(req: Request, res: Response) {
     try {
       const orderId = Number(req.params.orderId);
-      const { paymentMethod } = req.body;
+      const { paymentMethod, isSuccess } = req.body;
 
       if (!paymentMethod) {
         return res.status(400).json({ error: "Payment method is required" });
       }
 
+      // Mặc định isSuccess = true nếu không truyền vào
+      const paymentSuccess = isSuccess !== undefined ? isSuccess : true;
+
       const result = await PaymentService.processPayment(
         orderId,
-        paymentMethod
+        paymentSuccess
       );
 
       if (result.success) {

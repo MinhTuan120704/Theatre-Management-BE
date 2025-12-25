@@ -9,7 +9,6 @@ import Seat from "../models/seat.model";
 import Product from "../models/product.model";
 import Showtime from "../models/showTime.model";
 import EmailService from "./email.service";
-const SeatService = require("./seat.service").SeatService;
 
 export class OrderService {
   static async getOrderByUserId(userId: number) {
@@ -19,18 +18,27 @@ export class OrderService {
     const { products, tickets, ...orderData } = data;
     const transaction = (await Order.sequelize?.transaction()) ?? null;
     try {
-      // Kiểm tra xem các ghế trong `tickets` đã bị đặt chưa bằng cách gọi SeatService.getByShowtimeId
+      // Kiểm tra xem các ghế trong `tickets` đã bị đặt chưa bằng cách check Ticket.isReserved
       if (tickets && Array.isArray(tickets) && tickets.length > 0) {
         const pending = new Set<string>();
         for (const t of tickets) {
-          const seats = await SeatService.getByShowtimeId(t.showtimeId);
-          const seat = seats.find((s: any) => s.id === t.seatId);
+          // Kiểm tra xem đã có ticket nào đang đặt ghế này cho showtime này chưa
+          const existingTicket = await Ticket.findOne({
+            where: {
+              showtimeId: t.showtimeId,
+              seatId: t.seatId,
+              isReserved: true, // Chỉ check những ticket đang được đặt
+            },
+          });
+
           const key = `${t.showtimeId}:${t.seatId}`;
-          if (seat && seat.isReserved) {
+
+          if (existingTicket) {
             throw new Error(
               `Seat ${t.seatId} already reserved for showtime ${t.showtimeId}`
             );
           }
+
           if (pending.has(key)) {
             throw new Error(
               `Duplicate seat ${t.seatId} for showtime ${t.showtimeId} in request`
@@ -80,14 +88,9 @@ export class OrderService {
               showtimeId: t.showtimeId,
               seatId: t.seatId,
               reservedUntil: ticketReservedUntil,
+              isReserved: true, // Đánh dấu ticket là đã được đặt
             },
             { transaction }
-          );
-
-          // Đánh dấu ghế là đã được đặt
-          await Seat.update(
-            { isReserved: true },
-            { where: { id: t.seatId }, transaction }
           );
         }
       }
@@ -239,31 +242,7 @@ export class OrderService {
     if (!order) return null;
     const transaction = (await Order.sequelize?.transaction()) ?? null;
     try {
-      // Lấy danh sách tickets để giải phóng ghế
-      const tickets = transaction
-        ? await Ticket.findAll({
-            where: { orderId: order_id },
-            transaction,
-          })
-        : await Ticket.findAll({
-            where: { orderId: order_id },
-          });
-
-      // Giải phóng ghế
-      for (const ticket of tickets) {
-        if (transaction) {
-          await Seat.update(
-            { isReserved: false },
-            { where: { id: ticket.seatId }, transaction }
-          );
-        } else {
-          await Seat.update(
-            { isReserved: false },
-            { where: { id: ticket.seatId } }
-          );
-        }
-      }
-
+      // Xóa tickets (không cần giải phóng ghế riêng vì isReserved nằm trong ticket)
       await Ticket.destroy({ where: { orderId: order_id }, transaction });
       await OrderProductDetails.destroy({
         where: { orderId: order_id },

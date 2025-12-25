@@ -59,7 +59,6 @@ export default class Order extends Model {
   @Column({
     type: DataType.DATE,
     allowNull: true,
-    defaultValue: DataType.NOW,
   })
   declare paidAt: Date;
 

@@ -11,7 +11,7 @@ export class PaymentService {
    */
   static async processPayment(
     orderId: number,
-    paymentMethod: string
+    isSuccess: boolean
   ): Promise<{ success: boolean; message: string }> {
     const order = await Order.findByPk(orderId);
 
@@ -30,9 +30,6 @@ export class PaymentService {
       throw new Error(`Order is not pending. Current status: ${order.status}`);
     }
 
-    // Giả lập thanh toán (90% thành công, 10% thất bại để test)
-    const isSuccess = Math.random() > 0.1;
-
     if (isSuccess) {
       // Thanh toán thành công
       await order.update({
@@ -47,11 +44,6 @@ export class PaymentService {
         { where: { orderId: order.id } }
       );
 
-      // Gửi email xác nhận (chạy bất đồng bộ, không chờ kết quả)
-      OrderService.sendOrderConfirmationEmail(orderId).catch((err) => {
-        console.error("Error sending confirmation email:", err);
-      });
-
       return {
         success: true,
         message: "Payment successful",
@@ -60,7 +52,13 @@ export class PaymentService {
       // Thanh toán thất bại
       await order.update({
         status: "failed",
+        reservationExpiresAt: null,
       });
+
+      await Ticket.update(
+        { reservedUntil: null, isReserved: false },
+        { where: { orderId: order.id } }
+      );
 
       return {
         success: false,
@@ -70,7 +68,7 @@ export class PaymentService {
   }
 
   /**
-   * Hủy order đã hết hạn và giải phóng ghế
+   * Hủy order đã hết hạn - Update status thành cancelled
    */
   static async cancelExpiredOrder(orderId: number): Promise<void> {
     const transaction = (await Order.sequelize?.transaction()) ?? null;
@@ -81,16 +79,6 @@ export class PaymentService {
       if (!order) {
         throw new Error("Order not found");
       }
-
-      // Lấy danh sách tickets trước khi xóa để giải phóng ghế
-      const tickets = transaction
-        ? await Ticket.findAll({
-            where: { orderId: order.id },
-            transaction,
-          })
-        : await Ticket.findAll({
-            where: { orderId: order.id },
-          });
 
       // Cập nhật status order thành cancelled
       if (transaction) {
@@ -106,33 +94,6 @@ export class PaymentService {
         });
       }
 
-      // Giải phóng ghế (set isReserved = false)
-      for (const ticket of tickets) {
-        if (transaction) {
-          await Seat.update(
-            { isReserved: false },
-            { where: { id: ticket.seatId }, transaction }
-          );
-        } else {
-          await Seat.update(
-            { isReserved: false },
-            { where: { id: ticket.seatId } }
-          );
-        }
-      }
-
-      // Xóa các tickets
-      if (transaction) {
-        await Ticket.destroy({
-          where: { orderId: order.id },
-          transaction,
-        });
-      } else {
-        await Ticket.destroy({
-          where: { orderId: order.id },
-        });
-      }
-
       await transaction?.commit();
     } catch (error) {
       await transaction?.rollback();
@@ -141,31 +102,74 @@ export class PaymentService {
   }
 
   /**
-   * Tự động hủy các order đã hết hạn
+   * Tự động hủy các order đã hết hạn và xóa các order cancelled
    * Hàm này sẽ được gọi định kỳ (ví dụ: mỗi phút)
    */
   static async cleanupExpiredReservations(): Promise<number> {
-    const expiredOrders = await Order.findAll({
-      where: {
-        status: "pending",
-        reservationExpiresAt: {
-          [Op.lt]: new Date(), // Nhỏ hơn thời gian hiện tại
+    const transaction = (await Order.sequelize?.transaction()) ?? null;
+    let processedCount = 0;
+
+    try {
+      // 1. Tìm và update các order pending đã hết hạn thành cancelled
+      const expiredOrders = await Order.findAll({
+        where: {
+          status: "pending",
+          reservationExpiresAt: {
+            [Op.lt]: new Date(), // Nhỏ hơn thời gian hiện tại
+          },
         },
-      },
-    });
+      });
 
-    let cancelledCount = 0;
-
-    for (const order of expiredOrders) {
-      try {
-        await this.cancelExpiredOrder(order.id);
-        cancelledCount++;
-      } catch (error) {
-        console.error(`Failed to cancel expired order ${order.id}:`, error);
+      for (const order of expiredOrders) {
+        try {
+          await this.cancelExpiredOrder(order.id);
+          processedCount++;
+        } catch (error) {
+          console.error(`Failed to cancel expired order ${order.id}:`, error);
+        }
       }
+
+      // 2. Tìm và xóa hoàn toàn các order có status cancelled
+      const cancelledOrders = await Order.findAll({
+        where: {
+          status: "cancelled",
+        },
+      });
+
+      for (const order of cancelledOrders) {
+        try {
+          // Xóa tickets trước
+          if (transaction) {
+            await Ticket.destroy({
+              where: { orderId: order.id },
+              transaction,
+            });
+          } else {
+            await Ticket.destroy({
+              where: { orderId: order.id },
+            });
+          }
+
+          // Xóa order
+          if (transaction) {
+            await order.destroy({ transaction });
+          } else {
+            await order.destroy();
+          }
+
+          processedCount++;
+        } catch (error) {
+          console.error(`Failed to delete cancelled order ${order.id}:`, error);
+        }
+      }
+
+      await transaction?.commit();
+    } catch (error) {
+      await transaction?.rollback();
+      throw error;
     }
 
-    return cancelledCount;
+    return processedCount;
   }
 
   /**

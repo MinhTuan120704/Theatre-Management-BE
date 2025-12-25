@@ -49,6 +49,13 @@ export default class Ticket extends Model {
   })
   declare reservedUntil: Date | null;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isReserved: boolean;
+
   // Associations
   @BelongsTo(() => Order)
   order?: Order;
