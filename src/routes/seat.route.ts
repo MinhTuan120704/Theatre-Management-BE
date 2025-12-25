@@ -79,13 +79,9 @@ const router: Router = Router();
  *               seatNumber:
  *                 type: string
  *                 description: Seat number
- *               isReserved:
- *                 type: boolean
- *                 description: Is the seat reserved?
  *           example:
  *             roomId: 1
  *             seatNumber: "A1"
- *             isReserved: false
  *     responses:
  *       201:
  *         description: Seat created successfully
@@ -142,11 +138,8 @@ router.post(
  *               seatNumber:
  *                 type: string
  *                 description: Seat number
- *               isReserved:
- *                 type: boolean
- *                 description: Is the seat reserved?
  *           example:
- *             isReserved: true
+ *             seatNumber: "B5"
  *     responses:
  *       200:
  *         description: Seat updated successfully

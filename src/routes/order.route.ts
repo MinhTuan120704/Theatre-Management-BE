@@ -124,7 +124,6 @@ const router: Router = Router();
  *             totalPrice: 500
  *             paymentMethod: "credit_card"
  *             status: "pending"
- *             orderedAt: "2025-12-13T10:00:00Z"
  *             tickets: [{ showtimeId: 1, seatId: 2 }]
  *             products: [{ productId: 1, quantity: 2 }]
  *     responses:

@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -41,4 +42,27 @@ export default class Ticket extends Model {
     allowNull: false,
   })
   declare seatId: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare reservedUntil: Date | null;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isReserved: boolean;
+
+  // Associations
+  @BelongsTo(() => Order)
+  order?: Order;
+
+  @BelongsTo(() => ShowTime)
+  showtime?: ShowTime;
+
+  @BelongsTo(() => Seat)
+  seat?: Seat;
 }

@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import OrderProductDetails from "./orderProductDetails.model";
 
 @Table({
   tableName: "product",
@@ -35,4 +36,8 @@ export default class Product extends Model {
     allowNull: true,
   })
   declare image: string;
+
+  // Associations
+  @HasMany(() => OrderProductDetails)
+  orderProductDetails?: OrderProductDetails[];
 }
