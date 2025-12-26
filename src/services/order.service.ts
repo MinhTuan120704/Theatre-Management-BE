@@ -12,7 +12,104 @@ import EmailService from "./email.service";
 
 export class OrderService {
   static async getOrderByUserId(userId: number) {
-    return Order.findAll({ where: { userId } });
+    const orders = await Order.findAll({
+      where: { userId },
+      include: [
+        {
+          model: Ticket,
+          as: "tickets",
+          include: [
+            {
+              model: Showtime,
+              as: "showtime",
+              include: [
+                {
+                  model: Movie,
+                  as: "movie",
+                  attributes: ["id", "title"],
+                },
+                {
+                  model: Room,
+                  as: "room",
+                  attributes: ["id", "name"],
+                  include: [
+                    {
+                      model: Cinema,
+                      as: "cinema",
+                      attributes: ["id", "name", "address"],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              model: Seat,
+              as: "seat",
+              attributes: ["id", "seatNumber"],
+            },
+          ],
+        },
+        {
+          model: OrderProductDetails,
+          as: "orderProductDetails",
+          include: [
+            {
+              model: Product,
+              as: "product",
+              attributes: ["id", "name", "price"],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Format lại dữ liệu trả về
+    return orders.map((order: any) => {
+      const orderData = order.toJSON();
+      const firstTicket = orderData.tickets?.[0];
+      const showtime = firstTicket?.showtime;
+      const movie = showtime?.movie;
+      const room = showtime?.room;
+      const cinema = room?.cinema;
+
+      return {
+        id: orderData.id,
+        userId: orderData.userId,
+        totalPrice: orderData.totalPrice,
+        paymentMethod: orderData.paymentMethod,
+        status: orderData.status,
+        reservationExpiresAt: orderData.reservationExpiresAt,
+        paidAt: orderData.paidAt,
+        discountId: orderData.discountId,
+        orderedAt: orderData.orderedAt,
+        // Thông tin phim
+        movieId: movie?.id || null,
+        movieTitle: movie?.title || null,
+        // Thông tin rạp
+        cinemaId: cinema?.id || null,
+        cinemaName: cinema?.name || null,
+        cinemaAddress: cinema?.address || null,
+        // Thông tin phòng
+        roomId: room?.id || null,
+        roomName: room?.name || null,
+        // Thời gian chiếu
+        showTime: showtime?.showTime || null,
+        // Danh sách ghế
+        seats:
+          orderData.tickets?.map((ticket: any) => ({
+            seatId: ticket.seat?.id,
+            seatNumber: ticket.seat?.seatNumber,
+          })) || [],
+        // Danh sách sản phẩm
+        products:
+          orderData.orderProductDetails?.map((detail: any) => ({
+            productId: detail.product?.id,
+            productName: detail.product?.name,
+            productPrice: detail.product?.price,
+            quantity: detail.quantity,
+          })) || [],
+      };
+    });
   }
   static async create(data: any) {
     const { products, tickets, ...orderData } = data;
