@@ -78,7 +78,7 @@ export default class OrderController {
   static async cancelOrder(req: Request, res: Response) {
     try {
       const orderId = Number(req.params.id);
-      const userId = (req as any).user?.id; // Lấy userId từ token đã authenticate
+      const userId = req.user?.userId; // Lấy userId từ token đã authenticate
 
       if (!userId) {
         return res.status(401).json({ error: "Unauthorized" });
