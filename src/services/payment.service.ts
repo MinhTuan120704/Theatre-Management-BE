@@ -44,6 +44,14 @@ export class PaymentService {
         { where: { orderId: order.id } }
       );
 
+      // Gửi email xác nhận đơn hàng
+      try {
+        await OrderService.sendOrderConfirmationEmail(orderId);
+      } catch (emailError) {
+        console.error("Failed to send confirmation email:", emailError);
+        // Không throw error để không làm fail quá trình thanh toán
+      }
+
       return {
         success: true,
         message: "Payment successful",
