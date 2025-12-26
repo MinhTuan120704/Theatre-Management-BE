@@ -353,4 +353,101 @@ export class OrderService {
       throw error;
     }
   }
+
+  /**
+   * Hủy vé của người dùng
+   * Chỉ cho phép hủy nếu order đang ở trạng thái pending hoặc completed
+   * và thời gian chiếu phim chưa diễn ra
+   */
+  static async cancelOrder(orderId: number, userId: number) {
+    const transaction = (await Order.sequelize?.transaction()) ?? null;
+
+    try {
+      // Tìm order và kiểm tra quyền sở hữu
+      const order = await Order.findByPk(orderId);
+
+      if (!order) {
+        throw new Error("Order not found");
+      }
+
+      // Kiểm tra order có thuộc về user này không
+      if (order.userId !== userId) {
+        throw new Error("Unauthorized: You can only cancel your own orders");
+      }
+
+      // Kiểm tra trạng thái order
+      if (order.status === "cancelled") {
+        throw new Error("Order has already been cancelled");
+      }
+
+      if (order.status === "failed") {
+        throw new Error("Cannot cancel a failed order");
+      }
+
+      // Lấy thông tin tickets và showtime để kiểm tra thời gian chiếu
+      const tickets = await Ticket.findAll({
+        where: { orderId: order.id },
+        include: [
+          {
+            model: Showtime,
+            as: "showtime",
+            attributes: ["showTime"],
+          },
+        ],
+      });
+
+      if (tickets.length > 0) {
+        const firstTicket = tickets[0] as any;
+        const showtime = firstTicket.showtime;
+
+        if (showtime && showtime.showTime) {
+          const showtimeDate = new Date(showtime.showTime);
+          const now = new Date();
+
+          // Không cho phép hủy nếu phim đã chiếu hoặc sắp chiếu (ví dụ: trong vòng 30 phút)
+          const thirtyMinutesBeforeShow = new Date(
+            showtimeDate.getTime() - 30 * 60 * 1000
+          );
+
+          if (now >= thirtyMinutesBeforeShow) {
+            throw new Error(
+              "Cannot cancel order: showtime has started or is about to start"
+            );
+          }
+        }
+      }
+
+      // Cập nhật trạng thái order thành cancelled
+      await order.update(
+        {
+          status: "cancelled",
+          reservationExpiresAt: null,
+        },
+        { transaction }
+      );
+
+      // Giải phóng ghế - cập nhật isReserved = false và xóa reservedUntil
+      await Ticket.update(
+        {
+          isReserved: false,
+          reservedUntil: null,
+        },
+        {
+          where: { orderId: order.id },
+          transaction,
+        }
+      );
+
+      await transaction?.commit();
+
+      return {
+        success: true,
+        message: "Order cancelled successfully",
+        orderId: order.id,
+      };
+    } catch (error) {
+      await transaction?.rollback();
+      throw error;
+    }
+  }
 }

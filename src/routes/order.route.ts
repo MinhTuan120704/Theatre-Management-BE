@@ -263,6 +263,48 @@ router.delete(
 
 /**
  * @swagger
+ * /api/orders/{id}/cancel:
+ *   post:
+ *     summary: Cancel an order (user can only cancel their own orders)
+ *     tags: [Order]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Order ID to cancel
+ *     responses:
+ *       200:
+ *         description: Order cancelled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 orderId:
+ *                   type: integer
+ *       400:
+ *         description: Cannot cancel order (already cancelled, showtime has started, etc.)
+ *       403:
+ *         description: Unauthorized - can only cancel your own orders
+ *       404:
+ *         description: Order not found
+ */
+router.post(
+  "/:id/cancel",
+  writeOperationLimiter,
+  authenticate,
+  requirePermission(ResourcePermissions.orders.cancel),
+  OrderController.cancelOrder
+);
+
+/**
+ * @swagger
  * /api/orders/user/{userId}:
  *   get:
  *     summary: Get all orders by user ID
