@@ -1,4 +1,4 @@
-import Employee from '../models/employee.model';
+import Employee from "../models/employee.model";
 
 export class EmployeeService {
   static async create(data: any) {
